@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "a2a-adk-trip-agent"
+version = "0.1.0"
+description = "A small A2A trip planning demo built with Google ADK and OpenAI."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+  "google-adk[a2a]",
+  "litellm",
+  "python-dotenv",
+  "fastapi",
+  "uvicorn",
+  "sse-starlette",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.uv]
+package = false
