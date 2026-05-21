@@ -21,15 +21,35 @@ If Python 3.13 is not already installed locally, `uv` will download it when sync
 
 ## 3. Configure environment variables
 
-Copy `.env.example` to `.env` and fill in `OPENAI_API_KEY`.
+Copy `.env.example` to `.env` and set your model provider.
 
-The default model is:
+### Option A: Use Ollama (local, free)
 
-```text
-openai/gpt-5.4-nano
+1. Install [Ollama](https://ollama.com):
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
+2. Pull a model:
+   ```bash
+   ollama pull qwen2.5:7b
+   ```
+3. In `.env`, set:
+   ```env
+   OPENAI_API_KEY=ollama
+   OPENAI_MODEL=ollama/qwen2.5:7b
+   ```
+
+### Option B: Use OpenAI
+
+In `.env`, set:
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=openai/gpt-4o-mini
 ```
 
-If that is not available for your account, switch `OPENAI_MODEL` to `openai/gpt-4o-mini`.
+### Other providers
+
+See [LiteLLM docs](https://docs.litellm.ai/docs/providers) for Anthropic, Gemini, AWS Bedrock, and more. Just change `OPENAI_MODEL` to the `provider/model-name` format.
 
 ## 4. Start the specialist agents
 

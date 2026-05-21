@@ -8,7 +8,8 @@ from google.adk.agents.remote_a2a_agent import AGENT_CARD_WELL_KNOWN_PATH
 
 load_dotenv()
 
-DEFAULT_MODEL = "openai/gpt-5.4-nano"
+# Default model using litellm provider format (e.g., "openai/gpt-4o-mini", "ollama/qwen2.5:7b")
+DEFAULT_MODEL = "ollama/qwen2.5:7b"
 DEFAULT_HOST = "127.0.0.1"
 
 

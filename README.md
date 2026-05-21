@@ -58,7 +58,22 @@ This project targets Python 3.13.
 
 ## Model choice
 
-The default model is `openai/gpt-5.4-nano` through LiteLLM. If that model is not available in your OpenAI account or provider setup, change `OPENAI_MODEL` in `.env` to a compatible small model such as `openai/gpt-4o-mini`.
+The project uses LiteLLM, so you can pick any supported provider by changing `OPENAI_MODEL` in `.env`.
+
+**Local models (Ollama):**
+```env
+OPENAI_API_KEY=ollama
+OPENAI_MODEL=ollama/qwen2.5:7b
+```
+Install [Ollama](https://ollama.com), then run `ollama pull qwen2.5:7b` (or any other model).
+
+**OpenAI:**
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=openai/gpt-4o-mini
+```
+
+**Other providers:** See [LiteLLM docs](https://docs.litellm.ai/docs/providers) for Anthropic, Gemini, AWS Bedrock, and more.
 
 ## Testing
 
