@@ -24,10 +24,10 @@ Target Python 3.13. Use 4-space indentation, `snake_case` for functions/modules,
 ## Testing Guidelines
 There is no formal test framework yet. Use the smoke scripts as the baseline verification:
 
-- `scripts/smoke_services.py` for service/card wiring
-- `scripts/test_driver_trip.py` for a real driver invocation
+- `scripts/smoke_services.py` — validates all four A2A card endpoints (HTTP 200, correct agent name) and verifies driver sub-agent card resolution via HTTP. Exits non-zero on failure.
+- `scripts/test_driver_trip.py` — end-to-end trip prompt through the driver with content assertions (response must mention hotels, flights, and activities). Exits non-zero on failure.
 
-When adding behavior, update or add a script that exercises the new path.
+When adding behavior, update or add a script that exercises the new path. All test scripts use assertions for automated failure detection.
 
 ## Commit & Pull Request Guidelines
 This repository has no prior commit history, so use clear imperative commit messages such as `Add hotel agent smoke test`. For pull requests, include:

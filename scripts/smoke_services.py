@@ -13,7 +13,12 @@ if str(ROOT) not in sys.path:
 from agents.driver.agent import activities_agent, flight_agent, hotel_agent
 
 
-URLS = {
+AGENT_CARDS = {
+    "hotel": ("http://127.0.0.1:8001/.well-known/agent-card.json", hotel_agent),
+    "flight": ("http://127.0.0.1:8002/.well-known/agent-card.json", flight_agent),
+    "activities": ("http://127.0.0.1:8003/.well-known/agent-card.json", activities_agent),
+}
+ALL_URLS = {
     "hotel": "http://127.0.0.1:8001/.well-known/agent-card.json",
     "flight": "http://127.0.0.1:8002/.well-known/agent-card.json",
     "activities": "http://127.0.0.1:8003/.well-known/agent-card.json",
@@ -23,16 +28,26 @@ URLS = {
 
 async def check_cards() -> None:
     async with httpx.AsyncClient(timeout=10) as client:
-        for name, url in URLS.items():
+        for name, url in ALL_URLS.items():
             response = await client.get(url)
             response.raise_for_status()
-            print(f"{name}: {response.status_code} {response.json()['name']}")
+            data = response.json()
+            assert data["name"] == f"{name}_agent", (
+                f"Expected {name}_agent, got {data['name']}"
+            )
+            print(f"{name}: {response.status_code} {data['name']}")
 
 
 async def check_driver_subagents() -> None:
-    for agent in [hotel_agent, flight_agent, activities_agent]:
-        await agent._ensure_resolved()
-        print(f"{agent.name}: {agent._agent_card.name} -> {agent._agent_card.url}")
+    async with httpx.AsyncClient(timeout=10) as client:
+        for name, (url, agent) in AGENT_CARDS.items():
+            response = await client.get(url)
+            response.raise_for_status()
+            data = response.json()
+            assert data["name"] == agent.name, (
+                f"Expected {agent.name}, got {data['name']}"
+            )
+            print(f"{agent.name}: {data['name']} -> {url}")
 
 
 async def main() -> None:

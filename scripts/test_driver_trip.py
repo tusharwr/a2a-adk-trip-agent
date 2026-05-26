@@ -55,7 +55,19 @@ async def main() -> None:
             if text:
                 final_texts.append(text)
 
-    print("\n".join(final_texts))
+    combined = "\n".join(final_texts)
+    print(combined)
+
+    lower = combined.lower()
+    assert "hotel" in lower or "stay" in lower or "hostel" in lower, (
+        "Response missing hotel/accommodation suggestions"
+    )
+    assert "flight" in lower or "airport" in lower or "barcelona" in lower, (
+        "Response missing flight/transport suggestions"
+    )
+    assert "park" in lower or "museum" in lower or "beach" in lower or "tour" in lower or "market" in lower or "street" in lower, (
+        "Response missing activity suggestions"
+    )
 
 
 if __name__ == "__main__":

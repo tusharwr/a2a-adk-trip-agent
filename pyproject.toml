@@ -15,6 +15,7 @@ dependencies = [
   "fastapi",
   "uvicorn",
   "sse-starlette",
+  "python-multipart",
 ]
 
 [project.optional-dependencies]

@@ -63,9 +63,9 @@ The project uses LiteLLM, so you can pick any supported provider by changing `OP
 **Local models (Ollama):**
 ```env
 OPENAI_API_KEY=ollama
-OPENAI_MODEL=ollama/qwen2.5:7b
+OPENAI_MODEL=ollama/qwen2.5:1.5b
 ```
-Install [Ollama](https://ollama.com), then run `ollama pull qwen2.5:7b` (or any other model).
+Install [Ollama](https://ollama.com), then run `ollama pull qwen2.5:1.5b` (or any other model).
 
 **OpenAI:**
 ```env

@@ -31,12 +31,12 @@ Copy `.env.example` to `.env` and set your model provider.
    ```
 2. Pull a model:
    ```bash
-   ollama pull qwen2.5:7b
+   ollama pull qwen2.5:1.5b
    ```
 3. In `.env`, set:
    ```env
    OPENAI_API_KEY=ollama
-   OPENAI_MODEL=ollama/qwen2.5:7b
+   OPENAI_MODEL=ollama/qwen2.5:1.5b
    ```
 
 ### Option B: Use OpenAI
@@ -79,8 +79,12 @@ Each service exposes an A2A card on its configured port.
 
 In a fourth terminal:
 
+```bash
+PYTHONPATH=. uv run adk web agents --port 8000
+```
+
 ```powershell
-uv run adk web agents --port 8000
+$env:PYTHONPATH="."; uv run adk web agents --port 8000
 ```
 
 Open the browser URL shown by ADK, then select the `driver` agent.

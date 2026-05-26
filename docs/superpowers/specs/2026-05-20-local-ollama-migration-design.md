@@ -24,9 +24,9 @@ User prompt → Driver Agent → LiteLlm(model=ollama/...) → Ollama server (lo
 
 | File | Change | Rationale |
 |------|--------|-----------|
-| `.env` | `OPENAI_API_KEY=ollama` + `OPENAI_MODEL=ollama/qwen2.5:7b` | Runtime config — points all agents to local Ollama |
+| `.env` | `OPENAI_API_KEY=ollama` + `OPENAI_MODEL=ollama/qwen2.5:1.5b` | Runtime config — points all agents to local Ollama |
 | `.env.example` | Document OpenAI, Ollama, and other providers | Template for new developers |
-| `common/config.py` | Default model `ollama/qwen2.5:7b` | Fallback if env var is unset |
+| `common/config.py` | Default model `ollama/qwen2.5:1.5b` | Fallback if env var is unset |
 | `README.md` | Model choice section covers all providers | Documentation |
 | `RUN_INSTRUCTIONS.md` | Setup steps for Ollama + OpenAI | Documentation |
 
@@ -46,7 +46,7 @@ OPENAI_MODEL=openai/gpt-4o-mini
 
 # Ollama
 OPENAI_API_KEY=ollama
-OPENAI_MODEL=ollama/qwen2.5:7b
+OPENAI_MODEL=ollama/qwen2.5:1.5b
 
 # Anthropic (or any LiteLLM-supported provider)
 OPENAI_API_KEY=sk-ant-...
@@ -56,13 +56,13 @@ OPENAI_MODEL=anthropic/claude-sonnet-4-20250514
 ## User Steps to Complete the Switch
 
 1. Install Ollama: `curl -fsSL https://ollama.com/install.sh | sh`
-2. Pull the model: `ollama pull qwen2.5:7b`
+2. Pull the model: `ollama pull qwen2.5:1.5b`
 3. Ensure Ollama is running: `ollama serve` (usually runs as a service)
 4. Rebuild the venv: `uv sync`
 5. Run smoke tests: `uv run python scripts/smoke_services.py`
 
 ## Verification
 
-- `smoke_services.py` — checks all four A2A agent-card endpoints
-- `test_driver_trip.py` — end-to-end trip prompt through the driver
+- `smoke_services.py` — validates all four A2A agent-card endpoints (HTTP 200, correct agent name) and verifies driver sub-agent card resolution via HTTP. Exits non-zero on failure.
+- `test_driver_trip.py` — end-to-end trip prompt through the driver with content assertions (response must mention hotels, flights, and activities). Exits non-zero on failure.
 - No Python syntax or import errors

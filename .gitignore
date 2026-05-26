@@ -1,6 +1,7 @@
 .venv/
 __pycache__/
 *.pyc
+.adk/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
