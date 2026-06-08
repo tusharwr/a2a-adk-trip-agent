@@ -26,11 +26,10 @@ Copy `.env.example` to `.env` and set your model provider.
 ### Option A: Use Ollama (local, free)
 
 1. Install [Ollama](https://ollama.com):
-   ```bash
-   curl -fsSL https://ollama.com/install.sh | sh
-   ```
+   - Windows: download the installer from ollama.com or `winget install Ollama.Ollama`
+   - macOS/Linux: `curl -fsSL https://ollama.com/install.sh | sh`
 2. Pull a model:
-   ```bash
+   ```powershell
    ollama pull qwen2.5:1.5b
    ```
 3. In `.env`, set:
@@ -49,72 +48,80 @@ OPENAI_MODEL=openai/gpt-4o-mini
 
 ### Other providers
 
-See [LiteLLM docs](https://docs.litellm.ai/docs/providers) for Anthropic, Gemini, AWS Bedrock, and more. Just change `OPENAI_MODEL` to the `provider/model-name` format.
+See [LiteLLM docs](https://docs.litellm.ai/docs/providers) for Anthropic, Gemini, AWS Bedrock,
+and more. Just change `OPENAI_MODEL` to the `provider/model-name` format.
 
 ## 4. Start the specialist agents
 
 Open three terminals from the repo root.
 
-Hotel agent:
-
+**Hotel agent:**
 ```powershell
 uv run python -m agents.hotel.serve
 ```
 
-Flight agent:
-
+**Flight agent:**
 ```powershell
 uv run python -m agents.flight.serve
 ```
 
-Activities agent:
-
+**Activities agent:**
 ```powershell
 uv run python -m agents.activities.serve
 ```
 
-Each service exposes an A2A card on its configured port.
+Each service exposes an A2A card on its configured port (8001, 8002, 8003).
 
 ## 5. Start the ADK Web UI
 
 In a fourth terminal:
 
-```bash
-PYTHONPATH=. uv run adk web agents --port 8000
-```
-
 ```powershell
 $env:PYTHONPATH="."; uv run adk web agents --port 8000
 ```
 
-Open the browser URL shown by ADK, then select the `driver` agent.
+Open the browser URL shown by ADK (typically `http://127.0.0.1:8000`), then select the `driver`
+agent.
 
-## 6. Test a trip request
+## 6. Test trip queries
 
-Try:
+The driver uses a routing harness — it calls only the specialists a query actually needs.
 
-```text
-Plan a trip to Barcelona
-```
+| Query | Expected behaviour |
+|-------|--------------------|
+| `"Plan a 3-day trip to Barcelona for 2 people"` | Calls hotel + flight + activities; returns a combined plan |
+| `"Best hotels near La Rambla?"` | Calls hotel only; no flight or activities content |
+| `"Flights from London to Paris?"` | Calls flight only |
+| `"Things to do in Tokyo?"` | Calls activities only |
+| `"Hello"` | Returns a clarification question; no specialists called |
 
-Expected behavior:
+In the ADK event log you should see **Event 2 of 2** for every query — one user event and one
+`driver_agent` response. There are no `transfer_to_agent` entries because routing is handled by
+Python code, not LLM tool-calling.
 
-- the driver calls hotel, flight, and activities
-- the final answer merges all three specialist responses
+## 7. Run the test suite
 
-## 7. Smoke test the services
-
-With the four services already running, run:
+With the four services already running, run all validation scripts:
 
 ```powershell
+# Agent card health check
 uv run python scripts/smoke_services.py
+
+# Router unit tests (6 cases; requires Ollama running)
+uv run python scripts/test_router.py
+
+# Pipeline + agent tests (requires specialist services on 8001–8003)
+uv run python scripts/test_pipeline.py
+
+# E2E: full-trip Barcelona + hotel-only routing isolation (requires all 4 services)
+uv run python scripts/test_driver_trip.py
 ```
 
-This checks all four agent-card endpoints and verifies the driver can resolve the three specialist remote agents.
+All scripts exit non-zero on failure.
 
 ## 8. Optional: run the driver A2A server
 
-If you want to expose the driver as a remote A2A service too:
+If you want to expose the driver as a remote A2A service:
 
 ```powershell
 uv run python -m agents.driver.serve
@@ -122,6 +129,10 @@ uv run python -m agents.driver.serve
 
 ## Troubleshooting
 
-- If ADK cannot find the model, check `OPENAI_MODEL`.
-- If A2A calls fail, verify the specialist ports and card URLs in `.env`.
-- If the UI does not load, confirm the specialist services are already running.
+| Symptom | Fix |
+|---------|-----|
+| ADK cannot find the model | Check `OPENAI_MODEL` in `.env` |
+| A2A calls fail | Verify specialist ports and card URLs in `.env` |
+| UI does not load | Confirm specialist services are already running before starting ADK web |
+| Ollama connection refused | Run `ollama serve` (or ensure the Ollama app is running) |
+| Router always returns `[]` | The model may not follow JSON instructions; try a larger model |
