@@ -78,23 +78,28 @@ class TripPipelineAgent(BaseAgent):
             logger.error("[harness] pipeline error: %s", exc)
             specialist_context = "(specialist services unavailable)"
 
-        synthesis_prompt = (
-            f"{DRIVER_INSTRUCTION}\n\n"
-            f"--- SPECIALIST REPORTS ---\n\n"
-            f"{specialist_context}"
-        )
-        final_text = ""
-        try:
-            resp = await litellm.acompletion(
-                model=self.model.model,
-                messages=[{"role": "user", "content": synthesis_prompt}],
-            )
-            final_text = resp.choices[0].message.content or ""
-        except Exception as exc:
-            logger.error("[harness] synthesis error: %s", exc)
-
-        if not final_text.strip():
+        if len(domains) == 1:
             final_text = specialist_context
+        else:
+            synthesis_prompt = (
+                f"{DRIVER_INSTRUCTION}\n\n"
+                f"--- SPECIALIST REPORTS ---\n\n"
+                f"{specialist_context}"
+            )
+            synthesis = ""
+            try:
+                resp = await litellm.acompletion(
+                    model=self.model.model,
+                    messages=[{"role": "user", "content": synthesis_prompt}],
+                )
+                synthesis = (resp.choices[0].message.content or "").strip()
+            except Exception as exc:
+                logger.error("[harness] synthesis error: %s", exc)
+
+            if synthesis:
+                final_text = f"{synthesis}\n\n---\n\n{specialist_context}"
+            else:
+                final_text = specialist_context
 
         yield Event(
             invocation_id=ctx.invocation_id,
